@@ -75,6 +75,8 @@
         '<dt>Ditandatangani</dt><dd>' + esc(d.nama) + '<br><span class="muted">' + esc(d.jabatan) + '</span></dd>' +
         '<dt>Waktu tanda tangan</dt><dd>' + esc(d.waktu) + ' WIB</dd>' +
         '<dt>Kode verifikasi</dt><dd class="mono">' + esc(d.kode) + '</dd></dl>' +
+        (d.sk && d.sk.nomor ? '<p class="muted" style="margin-top:14px">Dasar: Keputusan Ketua Yayasan Wakaf Cendekia Takengon Nomor ' + esc(d.sk.nomor) + ' tentang Penggunaan Tanda Tangan Elektronik' +
+          (d.sk.url && /^https:\/\//.test(d.sk.url) ? ' · <a href="' + esc(d.sk.url) + '" target="_blank" rel="noopener">Lihat SK</a>' : '') + '.</p>' : '') +
         '<p class="ingat"><b>Penting:</b> pastikan <b>nomor, perihal, dan tujuan</b> di atas sama persis dengan surat yang Anda pegang. Jika berbeda, surat tersebut <b>tidak sah</b> walaupun QR-nya terbaca.</p></div>' +
         (d.hash ? '<div class="card"><h2>Cocokkan file PDF (opsional)</h2>' +
           '<p class="muted">Pilih file PDF surat yang Anda terima. Pemeriksaan dilakukan di perangkat Anda; file tidak diunggah ke mana pun.</p>' +
