@@ -37,6 +37,7 @@
   #ev form.cari { display:flex; gap:8px; margin-top:12px; }
   #ev form.cari input { flex:1; min-width:0; padding:10px; border:1px solid var(--line); border-radius:10px; font:inherit; text-transform:uppercase; }
   #ev form.cari button { padding:10px 14px; border:0; border-radius:10px; background:var(--teal); color:#fff; font:inherit; font-weight:600; }
+  #ev .ingat { margin:16px 0 0; padding:12px 14px; border-radius:10px; background:#FFF7E0; border:1px solid #F0D58C; font-size:13.5px; }
   #ev .h-ok { color:var(--ok); font-weight:600; } #ev .h-bad { color:var(--bad); font-weight:600; }
   @media (max-width:480px) { #ev dl { grid-template-columns:1fr; gap:2px; } #ev dd { margin-bottom:8px; } }
 </style>
@@ -55,6 +56,7 @@
   var isi = document.getElementById('ev-isi');
   var esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
   var IK_OK = '<svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m7.5 12.5 3 3 6-6.5"/></svg>';
+  var IK_QR = '<svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3h-3zM20 14v.01M14 20h.01M17 20h4v-3"/></svg>';
   var IK_X = '<svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6M9 9l6 6"/></svg>';
 
   var formCari = function (kode) {
@@ -68,10 +70,12 @@
         '<dl><dt>Nomor surat</dt><dd class="mono">' + esc(d.nomor) + '</dd>' +
         '<dt>Tanggal surat</dt><dd>' + esc(d.tanggal) + '</dd>' +
         '<dt>Perihal</dt><dd>' + esc(d.perihal) + '</dd>' +
+        (d.tujuan ? '<dt>Tujuan</dt><dd>' + esc(d.tujuan) + '</dd>' : '') +
         '<dt>Unit</dt><dd>' + esc(d.unit) + '</dd>' +
         '<dt>Ditandatangani</dt><dd>' + esc(d.nama) + '<br><span class="muted">' + esc(d.jabatan) + '</span></dd>' +
         '<dt>Waktu tanda tangan</dt><dd>' + esc(d.waktu) + ' WIB</dd>' +
-        '<dt>Kode verifikasi</dt><dd class="mono">' + esc(d.kode) + '</dd></dl></div>' +
+        '<dt>Kode verifikasi</dt><dd class="mono">' + esc(d.kode) + '</dd></dl>' +
+        '<p class="ingat"><b>Penting:</b> pastikan <b>nomor, perihal, dan tujuan</b> di atas sama persis dengan surat yang Anda pegang. Jika berbeda, surat tersebut <b>tidak sah</b> walaupun QR-nya terbaca.</p></div>' +
         (d.hash ? '<div class="card"><h2>Cocokkan file PDF (opsional)</h2>' +
           '<p class="muted">Pilih file PDF surat yang Anda terima. Pemeriksaan dilakukan di perangkat Anda; file tidak diunggah ke mana pun.</p>' +
           '<input type="file" id="ev-f" accept="application/pdf"><p id="ev-hasil" role="status" style="margin-top:10px"></p>' +
@@ -79,7 +83,7 @@
       if (d.hash) pasangCek(d.hash);
     } else {
       var k = d && d.kode ? d.kode : '';
-      isi.innerHTML = '<div class="card"><div class="status bad">' + IK_X + '<div><b>' + (k ? 'Surat tidak terdaftar' : 'Masukkan kode verifikasi') + '</b><span>' +
+      isi.innerHTML = '<div class="card"><div class="status ' + (k ? 'bad' : 'wait') + '">' + (k ? IK_X : IK_QR) + '<div><b>' + (k ? 'Surat tidak terdaftar' : 'Masukkan kode verifikasi') + '</b><span>' +
         (k ? 'Kode <span class="mono">' + esc(k) + '</span> tidak ditemukan di E-Arsip Cendekia.' : 'Pindai QR code pada surat, atau ketik kodenya di bawah.') +
         '</span></div></div>' + formCari(k) +
         '<p class="muted" style="margin-top:12px">Jika ragu, hubungi Yayasan Wakaf Cendekia Takengon untuk memastikan keaslian surat.</p></div>';
