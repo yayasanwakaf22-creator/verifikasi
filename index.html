@@ -1,0 +1,133 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Verifikasi Surat · Yayasan Wakaf Cendekia Takengon</title>
+<!--
+  Halaman verifikasi tanda tangan elektronik E-Arsip Cendekia (versi statis).
+  Bisa dipasang di: GitHub Pages / Blogger (Laman → mode HTML) / website yayasan.
+  Halaman ini tidak memerlukan login Google, sehingga aman dibuka di HP dengan banyak akun.
+  API_URL = link /exec aplikasi E-Arsip.
+-->
+<style>
+  #ev { --teal:#0F5E5A; --teal2:#0B4744; --gold:#E3B85A; --ink:#1F2A2A; --muted:#5F6B6B; --line:#E2E6E4; --ok:#1E7B4F; --okbg:#E7F5EC; --bad:#A33A2C; --badbg:#FBECE9;
+        color-scheme: only light; background:#F4F6F5; color:var(--ink); font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; min-height:100vh; margin:0; }
+  body { margin:0; background:#F4F6F5; }
+  #ev * { box-sizing:border-box; }
+  #ev .top { background:var(--teal); color:#fff; padding:18px 16px; }
+  #ev .wrap { max-width:560px; margin:0 auto; display:flex; gap:12px; align-items:center; }
+  #ev .logo { width:38px; height:38px; border-radius:10px; background:var(--gold); color:var(--teal2); display:grid; place-items:center; font-weight:800; flex:none; }
+  #ev .top b { display:block; font-size:16px; }
+  #ev .top span { font-size:13px; opacity:.85; }
+  #ev main { max-width:560px; margin:0 auto; padding:16px; }
+  #ev .card { background:#fff; border:1px solid var(--line); border-radius:14px; padding:18px; margin-bottom:14px; }
+  #ev .status { display:flex; gap:12px; align-items:center; border-radius:12px; padding:14px; }
+  #ev .status.ok { background:var(--okbg); color:var(--ok); }
+  #ev .status.bad { background:var(--badbg); color:var(--bad); }
+  #ev .status.wait { background:#F1F4F3; color:var(--muted); }
+  #ev .status svg { flex:none; }
+  #ev .status b { display:block; font-size:17px; }
+  #ev .status span { font-size:13px; color:var(--ink); }
+  #ev dl { margin:16px 0 0; display:grid; grid-template-columns:130px 1fr; gap:8px 12px; }
+  #ev dt { color:var(--muted); font-size:13px; }
+  #ev dd { margin:0; font-weight:600; overflow-wrap:anywhere; }
+  #ev .mono { font-family:ui-monospace,Menlo,Consolas,monospace; }
+  #ev h2 { font-size:15px; margin:0 0 6px; }
+  #ev p { margin:0 0 10px; }
+  #ev .muted { color:var(--muted); font-size:13px; }
+  #ev input[type=file] { width:100%; padding:10px; border:1px dashed var(--line); border-radius:10px; background:#FAFBFA; }
+  #ev form.cari { display:flex; gap:8px; margin-top:12px; }
+  #ev form.cari input { flex:1; min-width:0; padding:10px; border:1px solid var(--line); border-radius:10px; font:inherit; text-transform:uppercase; }
+  #ev form.cari button { padding:10px 14px; border:0; border-radius:10px; background:var(--teal); color:#fff; font:inherit; font-weight:600; }
+  #ev .h-ok { color:var(--ok); font-weight:600; } #ev .h-bad { color:var(--bad); font-weight:600; }
+  @media (max-width:480px) { #ev dl { grid-template-columns:1fr; gap:2px; } #ev dd { margin-bottom:8px; } }
+</style>
+
+<div id="ev">
+  <div class="top"><div class="wrap"><div class="logo">E</div><div><b>Verifikasi Surat</b><span>E-Arsip Cendekia · Yayasan Wakaf Cendekia Takengon</span></div></div></div>
+  <main id="ev-isi">
+    <div class="card"><div class="status wait"><div><b>Memeriksa surat…</b><span>Mohon tunggu sebentar.</span></div></div></div>
+  </main>
+</div>
+
+<script>
+(function () {
+  var API_URL = 'https://script.google.com/macros/s/AKfycbwqMkNvNNiXpKoSTYLWQoAQ6U5f5JwUuiX_1EO-87r_x6HFi7FN7n_qkdVYXnVBH2fR8A/exec';
+
+  var isi = document.getElementById('ev-isi');
+  var esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
+  var IK_OK = '<svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m7.5 12.5 3 3 6-6.5"/></svg>';
+  var IK_X = '<svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6M9 9l6 6"/></svg>';
+
+  var formCari = function (kode) {
+    return '<form class="cari" id="ev-form"><input id="ev-kode" placeholder="Contoh: K7QM-2XPA-9DHT" value="' + esc(kode) + '" aria-label="Kode verifikasi" maxlength="20"><button type="submit">Periksa</button></form>';
+  };
+
+  function tampil(d) {
+    if (d && d.ada) {
+      isi.innerHTML =
+        '<div class="card"><div class="status ok">' + IK_OK + '<div><b>Surat terdaftar dan sah</b><span>Surat ini diterbitkan dan ditandatangani secara elektronik melalui E-Arsip Cendekia.</span></div></div>' +
+        '<dl><dt>Nomor surat</dt><dd class="mono">' + esc(d.nomor) + '</dd>' +
+        '<dt>Tanggal surat</dt><dd>' + esc(d.tanggal) + '</dd>' +
+        '<dt>Perihal</dt><dd>' + esc(d.perihal) + '</dd>' +
+        '<dt>Unit</dt><dd>' + esc(d.unit) + '</dd>' +
+        '<dt>Ditandatangani</dt><dd>' + esc(d.nama) + '<br><span class="muted">' + esc(d.jabatan) + '</span></dd>' +
+        '<dt>Waktu tanda tangan</dt><dd>' + esc(d.waktu) + ' WIB</dd>' +
+        '<dt>Kode verifikasi</dt><dd class="mono">' + esc(d.kode) + '</dd></dl></div>' +
+        (d.hash ? '<div class="card"><h2>Cocokkan file PDF (opsional)</h2>' +
+          '<p class="muted">Pilih file PDF surat yang Anda terima. Pemeriksaan dilakukan di perangkat Anda; file tidak diunggah ke mana pun.</p>' +
+          '<input type="file" id="ev-f" accept="application/pdf"><p id="ev-hasil" role="status" style="margin-top:10px"></p>' +
+          '<p class="muted">Surat yang dicetak lalu di-scan atau difoto akan selalu berbeda. Untuk surat cetak, cukup cocokkan nomor dan perihal di atas.</p></div>' : '');
+      if (d.hash) pasangCek(d.hash);
+    } else {
+      var k = d && d.kode ? d.kode : '';
+      isi.innerHTML = '<div class="card"><div class="status bad">' + IK_X + '<div><b>' + (k ? 'Surat tidak terdaftar' : 'Masukkan kode verifikasi') + '</b><span>' +
+        (k ? 'Kode <span class="mono">' + esc(k) + '</span> tidak ditemukan di E-Arsip Cendekia.' : 'Pindai QR code pada surat, atau ketik kodenya di bawah.') +
+        '</span></div></div>' + formCari(k) +
+        '<p class="muted" style="margin-top:12px">Jika ragu, hubungi Yayasan Wakaf Cendekia Takengon untuk memastikan keaslian surat.</p></div>';
+      pasangForm();
+    }
+  }
+
+  function gagal() {
+    isi.innerHTML = '<div class="card"><div class="status bad">' + IK_X + '<div><b>Tidak dapat memeriksa saat ini</b><span>Periksa koneksi internet, lalu muat ulang halaman ini.</span></div></div></div>';
+  }
+
+  function pasangForm() {
+    var f = document.getElementById('ev-form');
+    if (!f) return;
+    f.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var k = document.getElementById('ev-kode').value.trim().toUpperCase();
+      if (!k) return;
+      var u = new URL(location.href); u.searchParams.set('v', k);
+      history.replaceState(null, '', u.toString());
+      periksa(k);
+    });
+  }
+
+  function pasangCek(hash) {
+    var f = document.getElementById('ev-f');
+    f.addEventListener('change', function () {
+      var el = document.getElementById('ev-hasil');
+      var file = f.files[0];
+      if (!file) { el.textContent = ''; return; }
+      el.className = ''; el.textContent = 'Memeriksa…';
+      file.arrayBuffer().then(function (b) { return crypto.subtle.digest('SHA-256', b); }).then(function (h) {
+        var hex = Array.prototype.map.call(new Uint8Array(h), function (x) { return ('0' + x.toString(16)).slice(-2); }).join('');
+        if (hex === hash) { el.className = 'h-ok'; el.textContent = '✓ File cocok: isi PDF sama persis dengan surat yang ditandatangani.'; }
+        else { el.className = 'h-bad'; el.textContent = '✗ File tidak cocok: PDF ini berbeda dari surat asli (mungkin sudah diubah, atau bukan file aslinya).'; }
+      }).catch(function () { el.className = 'h-bad'; el.textContent = 'Browser ini tidak bisa memeriksa file.'; });
+    });
+  }
+
+  function periksa(kode) {
+    isi.innerHTML = '<div class="card"><div class="status wait"><div><b>Memeriksa surat…</b><span>Mohon tunggu sebentar.</span></div></div></div>';
+    // credentials: 'omit' → tanpa cookie akun Google, jadi tidak terkena masalah banyak akun
+    fetch(API_URL + '?api=verif&v=' + encodeURIComponent(kode), { credentials: 'omit', redirect: 'follow' })
+      .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+      .then(tampil).catch(gagal);
+  }
+
+  var kode = (new URLSearchParams(location.search).get('v') || '').trim().toUpperCase();
+  if (kode) periksa(kode); else tampil({ ada: false, kode: '' });
+})();
+</script>
